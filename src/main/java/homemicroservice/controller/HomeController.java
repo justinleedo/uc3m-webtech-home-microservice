@@ -1,5 +1,6 @@
 package homemicroservice.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +52,14 @@ public class HomeController {
 		return home;
 	}
 	
+//	@RequestMapping("/homes/find/{name}/{start_date}/{end_date}/{price}/{type}/{adults}/{kids}")
+//	public List<Home>findHome(@PathVariable String name, @PathVariable Date start_date, @PathVariable Date end_date, @PathVariable int price, @PathVariable int type, @PathVariable int adults, @PathVariable int kids){
+//		String queryString = "SELECT h FROM Home h WHERE LOWER(h.name) LIKE :pattern AND h.date_available_start<=:start_date AND h.date_available_end>=:end_date AND h.number_of_guests >= :number_of_guests";
+//		
+//		return null;
+//		
+//	}
+//	
 	@RequestMapping(method = RequestMethod.POST, value="/homes")
 	public Home saveHome (@RequestBody @Validated Home home){
 		return homeDAO.save(home);
