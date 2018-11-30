@@ -16,5 +16,8 @@ public interface HomeDAO extends CrudRepository<Home, Long> {
 	
 	public Home findByName(String name);
 	
+	@Query("SELECT h from Home h JOIN h.user u WHERE u.userid =:user_userid")
+	public List<Home> findByHost(@Param("user_userid") long id);
+	
 	public List<Home> findAll();
 }

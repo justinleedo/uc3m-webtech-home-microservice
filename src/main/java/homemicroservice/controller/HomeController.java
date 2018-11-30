@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.google.gson.JsonObject;
 
 import homemicroservice.dao.HomeDAO;
 import homemicroservice.domains.Home;
+import homemicroservice.domains.User;
 
 @RestController
 @CrossOrigin
@@ -35,6 +37,12 @@ public class HomeController {
 	public Home getHomeByID(@PathVariable long id) {
 		Home home = homeDAO.findByHomeID(id);
 		return home;
+	}
+	
+	@RequestMapping("/homes/find/{hostid}")
+	public List<Home> getHomesForHost(long hostid){
+		List<Home> hosthome = homeDAO.findByHost(hostid);
+		return hosthome;
 	}
 	
 	@RequestMapping("/homes/find/{name}") 
