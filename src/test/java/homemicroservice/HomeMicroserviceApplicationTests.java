@@ -1,4 +1,4 @@
-package usermicroservice;
+package homemicroservice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserMicroserviceApplicationTests {
+public class HomeMicroserviceApplicationTests {
 
 	@Test
 	public void contextLoads() {
