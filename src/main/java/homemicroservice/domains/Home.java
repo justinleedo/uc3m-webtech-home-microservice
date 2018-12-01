@@ -40,7 +40,6 @@ public class Home implements Serializable {
 
 	private int type;
 
-	@JsonIgnore
 	//bi-directional many-to-one association to Booking
 	@JsonIgnore
 	@OneToMany(mappedBy="home")

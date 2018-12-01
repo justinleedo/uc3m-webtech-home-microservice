@@ -40,8 +40,8 @@ public class HomeController {
 		return home;
 	}
 	
-	@RequestMapping("/homes/find/{hostid}")
-	public List<Home> getHomesForHost(long hostid){
+	@RequestMapping("/homes/find/user/{hostid}")
+	public List<Home> getHomesForHost(@PathVariable long hostid){
 		List<Home> hosthome = homeDAO.findByHost(hostid);
 		return hosthome;
 	}
