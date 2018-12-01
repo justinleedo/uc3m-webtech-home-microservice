@@ -42,6 +42,7 @@ public class Home implements Serializable {
 
 	@JsonIgnore
 	//bi-directional many-to-one association to Booking
+	@JsonIgnore
 	@OneToMany(mappedBy="home")
 	private List<Booking> bookings1;
 

@@ -1,9 +1,11 @@
 package homemicroservice.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,7 @@ import com.google.gson.JsonObject;
 
 import homemicroservice.dao.HomeDAO;
 import homemicroservice.domains.Home;
+import homemicroservice.domains.User;
 
 @RestController
 @CrossOrigin
@@ -37,12 +40,26 @@ public class HomeController {
 		return home;
 	}
 	
+	@RequestMapping("/homes/find/{hostid}")
+	public List<Home> getHomesForHost(long hostid){
+		List<Home> hosthome = homeDAO.findByHost(hostid);
+		return hosthome;
+	}
+	
 	@RequestMapping("/homes/find/{name}") 
 	public Home getHomeByName(@PathVariable String name){
 		Home home = homeDAO.findByName(name);
 		return home;
 	}
 	
+//	@RequestMapping("/homes/find/{name}/{start_date}/{end_date}/{price}/{type}/{adults}/{kids}")
+//	public List<Home>findHome(@PathVariable String name, @PathVariable Date start_date, @PathVariable Date end_date, @PathVariable int price, @PathVariable int type, @PathVariable int adults, @PathVariable int kids){
+//		String queryString = "SELECT h FROM Home h WHERE LOWER(h.name) LIKE :pattern AND h.date_available_start<=:start_date AND h.date_available_end>=:end_date AND h.number_of_guests >= :number_of_guests";
+//		
+//		return null;
+//		
+//	}
+//	
 	@RequestMapping(method = RequestMethod.POST, value="/homes")
 	public Home saveHome (@RequestBody @Validated Home home){
 		return homeDAO.save(home);
