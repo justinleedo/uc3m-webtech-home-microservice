@@ -6,6 +6,10 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +33,9 @@ public class HomeController {
 	@Autowired
 	HomeDAO homeDAO;
 	
+	@Autowired
+	JdbcTemplate jdbc;
+	
 	@RequestMapping("/homes")
 	public List<Home> getHomes(){
 		return homeDAO.findAll();
@@ -51,6 +58,86 @@ public class HomeController {
 		Home home = homeDAO.findByName(name);
 		return home;
 	}
+	
+	@RequestMapping(method = RequestMethod.POST, value="/homes/search")
+	public ResponseEntity<List<Home>> searchHomes(@PathVariable String name, @PathVariable Date start_date, @PathVariable Date end_date, @PathVariable int price,@PathVariable  int type,@PathVariable int adults,@PathVariable int kids){
+		String query = "SELECT h FROM Home h WHERE LOWER(h.name) LIKE ";
+		
+		String pattern = "%" + name.toLowerCase() + "% ";
+		
+		query += pattern;
+		
+		String priceparse;
+		switch (price) {
+		case 0:
+			priceparse = " ";
+			break;
+		case 1:
+			priceparse = " AND h.price < 35 ";
+			break;
+		case 2:
+			priceparse = " AND h.price > 35 AND h.price < 69 ";
+			break;
+		case 3:
+			priceparse = " AND h.price > 70 AND h.price < 130 ";
+			break;
+		case 4:
+			priceparse = " AND h.price > 131 ";
+			break;
+		default:
+			priceparse = " ";
+			break;
+		}
+		
+		query += priceparse;
+		
+		query += "AND h.date_available_start<= " + start_date + " AND h.date_available_end>= " + end_date + "AND h.number_of_guests >= ";
+		
+		int numGuests = adults + kids;
+		
+		query += numGuests;
+		
+		System.out.println("[ADVANCEDSEARCH][HOMES] ["+query+"]");
+		ResponseEntity<List<Home>> response;
+		
+		try{
+			List<Home> listHomes = jdbc.query(query, new BeanPropertyRowMapper(Home.class));
+			response = new ResponseEntity<List<Home>>(listHomes, HttpStatus.OK);
+		} catch (Exception e){
+			e.printStackTrace();
+			response = new ResponseEntity<List<Home>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return response;
+	}
+	
+	/*
+	 * SAMPLE JDBC SEARCH WITH TELMO'S CODE
+	 * @RequestMapping (method = RequestMethod.POST, value="/users/jdbc")
+	public ResponseEntity<List<User>> jdbcSearch(){
+		
+		String query = "SELECT * FROM user";
+		query+=" where name = '"+"Frodo"+"'";
+			
+		System.out.println("[ADVANCED SEARCH][USERS] ["+query+"]");
+		ResponseEntity<List<User>> response;
+		
+		try{
+			// To save having to map the data returned as rows to the attributes
+			// the beans use BeanPropertyRowMapper. Just make sure that the names
+			// of the columns and the attributes match
+			List<User> luser  = jdbc.query(query,new BeanPropertyRowMapper(User.class));
+			
+			response = new ResponseEntity<List<User>>(luser, HttpStatus.OK);
+		}catch(Exception e){
+			e.printStackTrace();
+			response = new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return response;
+
+	}
+	 * 
+	 * 
+	 */
 	
 //	@RequestMapping("/homes/find/{name}/{start_date}/{end_date}/{price}/{type}/{adults}/{kids}")
 //	public List<Home>findHome(@PathVariable String name, @PathVariable Date start_date, @PathVariable Date end_date, @PathVariable int price, @PathVariable int type, @PathVariable int adults, @PathVariable int kids){
