@@ -60,44 +60,46 @@ public class HomeController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value="/homes/search")
-	public ResponseEntity<List<Home>> searchHomes(@PathVariable String name, @PathVariable Date start_date, @PathVariable Date end_date, @PathVariable int price,@PathVariable  int type,@PathVariable int adults,@PathVariable int kids){
-		String query = "SELECT h FROM Home h WHERE LOWER(h.name) LIKE ";
-		
-		String pattern = "%" + name.toLowerCase() + "% ";
-		
+	public ResponseEntity<List<Home>> searchHomes(@RequestBody String jsonString){
+		String query = "SELECT * FROM Home WHERE LOWER(name) LIKE ";
+		JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
+		String name = jobj.get("name").getAsString();
+	
+		String pattern = "'%" + name.toLowerCase() + "%'";
+//		
 		query += pattern;
+//		
+//		String priceparse;
+//		switch (price) {
+//		case 0:
+//			priceparse = " ";
+//			break;
+//		case 1:
+//			priceparse = " AND h.price < 35 ";
+//			break;
+//		case 2:
+//			priceparse = " AND h.price > 35 AND h.price < 69 ";
+//			break;
+//		case 3:
+//			priceparse = " AND h.price > 70 AND h.price < 130 ";
+//			break;
+//		case 4:
+//			priceparse = " AND h.price > 131 ";
+//			break;
+//		default:
+//			priceparse = " ";
+//			break;
+//		}
+//		
+//		query += priceparse;
+//		
+//		query += "AND h.date_available_start<= " + start_date + " AND h.date_available_end>= " + end_date + "AND h.number_of_guests >= ";
+//		
+//		int numGuests = adults + kids;
+//		
+//		query += numGuests;
 		
-		String priceparse;
-		switch (price) {
-		case 0:
-			priceparse = " ";
-			break;
-		case 1:
-			priceparse = " AND h.price < 35 ";
-			break;
-		case 2:
-			priceparse = " AND h.price > 35 AND h.price < 69 ";
-			break;
-		case 3:
-			priceparse = " AND h.price > 70 AND h.price < 130 ";
-			break;
-		case 4:
-			priceparse = " AND h.price > 131 ";
-			break;
-		default:
-			priceparse = " ";
-			break;
-		}
-		
-		query += priceparse;
-		
-		query += "AND h.date_available_start<= " + start_date + " AND h.date_available_end>= " + end_date + "AND h.number_of_guests >= ";
-		
-		int numGuests = adults + kids;
-		
-		query += numGuests;
-		
-		System.out.println("[ADVANCEDSEARCH][HOMES] ["+query+"]");
+		System.out.println(query);
 		ResponseEntity<List<Home>> response;
 		
 		try{
