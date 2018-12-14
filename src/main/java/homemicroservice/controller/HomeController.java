@@ -6,6 +6,10 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +32,9 @@ public class HomeController {
 
 	@Autowired
 	HomeDAO homeDAO;
+	
+	@Autowired
+	JdbcTemplate jdbc;
 	
 	@RequestMapping("/homes")
 	public List<Home> getHomes(){
@@ -52,14 +59,63 @@ public class HomeController {
 		return home;
 	}
 	
-//	@RequestMapping("/homes/find/{name}/{start_date}/{end_date}/{price}/{type}/{adults}/{kids}")
-//	public List<Home>findHome(@PathVariable String name, @PathVariable Date start_date, @PathVariable Date end_date, @PathVariable int price, @PathVariable int type, @PathVariable int adults, @PathVariable int kids){
-//		String queryString = "SELECT h FROM Home h WHERE LOWER(h.name) LIKE :pattern AND h.date_available_start<=:start_date AND h.date_available_end>=:end_date AND h.number_of_guests >= :number_of_guests";
-//		
-//		return null;
-//		
-//	}
-//	
+	@RequestMapping(method = RequestMethod.POST, value="/homes/search")
+	public ResponseEntity<List<Home>> searchHomes(@RequestBody String jsonString){
+		String query = "SELECT * FROM home WHERE LOWER(name) LIKE ";
+		JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
+		
+		String name = jobj.get("name").getAsString();
+		String pattern = "'%" + name.toLowerCase() + "%'";
+		query += pattern;
+		
+		int price = jobj.get("price").getAsInt();
+		String priceparse;
+		switch (price) {
+		case 0:
+			priceparse = " ";
+			break;
+		case 1:
+			priceparse = " AND price < 35 ";
+			break;
+		case 2:
+			priceparse = " AND price > 35 AND price < 69 ";
+			break;
+		case 3:
+			priceparse = " AND price > 70 AND price < 130 ";
+			break;
+		case 4:
+			priceparse = " AND price > 131 ";
+			break;
+		default:
+			priceparse = " ";
+			break;
+		}
+		query += priceparse;
+		
+		String start = jobj.get("start").getAsString();
+		query += "AND date_available_start<= '" + start +"'"; 
+		
+		String end = jobj.get("end").getAsString();
+		query += "AND date_available_end>= '" + end +"'"; 
+		
+		int adults = jobj.get("adults").getAsInt();
+		int kids = jobj.get("kids").getAsInt();
+		int guests = adults + kids;
+		query += "AND number_of_guests >= " + guests;
+	
+		System.out.println(query);
+		ResponseEntity<List<Home>> response;
+		
+		try{
+			List<Home> listHomes = jdbc.query(query, new BeanPropertyRowMapper(Home.class));
+			response = new ResponseEntity<List<Home>>(listHomes, HttpStatus.OK);
+		} catch (Exception e){
+			e.printStackTrace();
+			response = new ResponseEntity<List<Home>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return response;
+	}
+	
 	@RequestMapping(method = RequestMethod.POST, value="/homes")
 	public Home saveHome (@RequestBody @Validated Home home){
 		return homeDAO.save(home);
