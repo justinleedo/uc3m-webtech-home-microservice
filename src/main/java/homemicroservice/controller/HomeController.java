@@ -61,44 +61,48 @@ public class HomeController {
 	
 	@RequestMapping(method = RequestMethod.POST, value="/homes/search")
 	public ResponseEntity<List<Home>> searchHomes(@RequestBody String jsonString){
-		String query = "SELECT * FROM Home WHERE LOWER(name) LIKE ";
+		String query = "SELECT * FROM home WHERE LOWER(name) LIKE ";
 		JsonObject jobj = new Gson().fromJson(jsonString, JsonObject.class);
-		String name = jobj.get("name").getAsString();
-	
-		String pattern = "'%" + name.toLowerCase() + "%'";
-//		
-		query += pattern;
-//		
-//		String priceparse;
-//		switch (price) {
-//		case 0:
-//			priceparse = " ";
-//			break;
-//		case 1:
-//			priceparse = " AND h.price < 35 ";
-//			break;
-//		case 2:
-//			priceparse = " AND h.price > 35 AND h.price < 69 ";
-//			break;
-//		case 3:
-//			priceparse = " AND h.price > 70 AND h.price < 130 ";
-//			break;
-//		case 4:
-//			priceparse = " AND h.price > 131 ";
-//			break;
-//		default:
-//			priceparse = " ";
-//			break;
-//		}
-//		
-//		query += priceparse;
-//		
-//		query += "AND h.date_available_start<= " + start_date + " AND h.date_available_end>= " + end_date + "AND h.number_of_guests >= ";
-//		
-//		int numGuests = adults + kids;
-//		
-//		query += numGuests;
 		
+		String name = jobj.get("name").getAsString();
+		String pattern = "'%" + name.toLowerCase() + "%'";
+		query += pattern;
+		
+		int price = jobj.get("price").getAsInt();
+		String priceparse;
+		switch (price) {
+		case 0:
+			priceparse = " ";
+			break;
+		case 1:
+			priceparse = " AND price < 35 ";
+			break;
+		case 2:
+			priceparse = " AND price > 35 AND price < 69 ";
+			break;
+		case 3:
+			priceparse = " AND price > 70 AND price < 130 ";
+			break;
+		case 4:
+			priceparse = " AND price > 131 ";
+			break;
+		default:
+			priceparse = " ";
+			break;
+		}
+		query += priceparse;
+		
+		String start = jobj.get("start").getAsString();
+		query += "AND date_available_start<= '" + start +"'"; 
+		
+		String end = jobj.get("end").getAsString();
+		query += "AND date_available_end>= '" + end +"'"; 
+		
+		int adults = jobj.get("adults").getAsInt();
+		int kids = jobj.get("kids").getAsInt();
+		int guests = adults + kids;
+		query += "AND number_of_guests >= " + guests;
+	
 		System.out.println(query);
 		ResponseEntity<List<Home>> response;
 		
