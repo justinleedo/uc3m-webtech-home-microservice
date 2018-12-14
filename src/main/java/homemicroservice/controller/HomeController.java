@@ -116,43 +116,6 @@ public class HomeController {
 		return response;
 	}
 	
-	/*
-	 * SAMPLE JDBC SEARCH WITH TELMO'S CODE
-	 * @RequestMapping (method = RequestMethod.POST, value="/users/jdbc")
-	public ResponseEntity<List<User>> jdbcSearch(){
-		
-		String query = "SELECT * FROM user";
-		query+=" where name = '"+"Frodo"+"'";
-			
-		System.out.println("[ADVANCED SEARCH][USERS] ["+query+"]");
-		ResponseEntity<List<User>> response;
-		
-		try{
-			// To save having to map the data returned as rows to the attributes
-			// the beans use BeanPropertyRowMapper. Just make sure that the names
-			// of the columns and the attributes match
-			List<User> luser  = jdbc.query(query,new BeanPropertyRowMapper(User.class));
-			
-			response = new ResponseEntity<List<User>>(luser, HttpStatus.OK);
-		}catch(Exception e){
-			e.printStackTrace();
-			response = new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return response;
-
-	}
-	 * 
-	 * 
-	 */
-	
-//	@RequestMapping("/homes/find/{name}/{start_date}/{end_date}/{price}/{type}/{adults}/{kids}")
-//	public List<Home>findHome(@PathVariable String name, @PathVariable Date start_date, @PathVariable Date end_date, @PathVariable int price, @PathVariable int type, @PathVariable int adults, @PathVariable int kids){
-//		String queryString = "SELECT h FROM Home h WHERE LOWER(h.name) LIKE :pattern AND h.date_available_start<=:start_date AND h.date_available_end>=:end_date AND h.number_of_guests >= :number_of_guests";
-//		
-//		return null;
-//		
-//	}
-//	
 	@RequestMapping(method = RequestMethod.POST, value="/homes")
 	public Home saveHome (@RequestBody @Validated Home home){
 		return homeDAO.save(home);
